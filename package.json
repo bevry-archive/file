@@ -1,6 +1,6 @@
 {
   "name": "@bevry/file",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Helpers for reading, writing, deleting, and accessing a file.",
   "homepage": "https://github.com/bevry/file",
   "license": "MIT",

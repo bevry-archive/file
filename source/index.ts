@@ -3,6 +3,7 @@ import {
 	readFile as _readFile,
 	writeFile as _writeFile,
 	unlink as _unlink,
+	readdir as _readdir,
 	constants,
 } from 'fs'
 import Errlop from 'errlop'
@@ -190,6 +191,43 @@ export async function deleteFile(path: string): Promise<void> {
 	} catch (err) {
 		throw new Errlop(
 			`failed to delete the existing and writable file: ${path}`,
+			err
+		)
+	}
+}
+
+/** Read a directory */
+export function readdir(path: string): Promise<Array<string>> {
+	return new Promise(function (resolve, reject) {
+		_readdir(path, function (err, files) {
+			if (err) return reject(new Errlop(`failed to read file at: ${path}`, err))
+			return resolve(files)
+		})
+	})
+}
+
+/** Read a directory safely */
+export async function readDirectory(path: string): Promise<Array<string>> {
+	// check exists
+	try {
+		await exists(path)
+	} catch (err) {
+		throw new Errlop(`unable to read the non-existent directory: ${path}`, err)
+	}
+
+	// check readable
+	try {
+		await readable(path)
+	} catch (err) {
+		throw new Errlop(`no read permission for the directory: ${path}`, err)
+	}
+
+	// attempt read
+	try {
+		return await readdir(path)
+	} catch (err) {
+		throw new Errlop(
+			`failed to read the existing and readable directory: ${path}`,
 			err
 		)
 	}
