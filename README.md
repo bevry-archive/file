@@ -52,7 +52,7 @@ Helpers for reading, writing, deleting, and accessing a file.
 
 ``` html
 <script type="module">
-    import * as pkg from '//cdn.skypack.dev/@bevry/file@^1.1.0'
+    import * as pkg from '//cdn.skypack.dev/@bevry/file@^1.2.0'
 </script>
 ```
 
@@ -60,7 +60,7 @@ Helpers for reading, writing, deleting, and accessing a file.
 
 ``` html
 <script type="module">
-    import * as pkg from '//unpkg.com/@bevry/file@^1.1.0'
+    import * as pkg from '//unpkg.com/@bevry/file@^1.2.0'
 </script>
 ```
 
@@ -68,7 +68,7 @@ Helpers for reading, writing, deleting, and accessing a file.
 
 ``` html
 <script type="module">
-    import * as pkg from '//dev.jspm.io/@bevry/file@1.1.0'
+    import * as pkg from '//dev.jspm.io/@bevry/file@1.2.0'
 </script>
 ```
 
