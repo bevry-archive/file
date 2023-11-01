@@ -23,17 +23,17 @@ kava.suite('@bevry/file', function (suite, test) {
 				equal(
 					await isPresent(tmp),
 					false,
-					'is not present when it is not present'
+					'is not present when it is not present',
 				)
 				equal(
 					await isReadable(tmp),
 					false,
-					'is not readable when it is not present'
+					'is not readable when it is not present',
 				)
 				equal(
 					await isWritable(tmp),
 					false,
-					'is not writable when it is not present'
+					'is not writable when it is not present',
 				)
 				await writeFile(tmp, data)
 				equal(await isPresent(tmp), true, 'is present when it is present')

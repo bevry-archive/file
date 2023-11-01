@@ -81,24 +81,24 @@ export async function readFile(path: string): Promise<string> {
 	// check exists
 	try {
 		await exists(path)
-	} catch (err) {
+	} catch (err: any) {
 		throw new Errlop(`unable to read the non-existent file: ${path}`, err)
 	}
 
 	// check readable
 	try {
 		await readable(path)
-	} catch (err) {
+	} catch (err: any) {
 		throw new Errlop(`no read permission for the existing file: ${path}`, err)
 	}
 
 	// attempt read
 	try {
 		return await read(path)
-	} catch (err) {
+	} catch (err: any) {
 		throw new Errlop(
 			`failed to read the existing and readable file: ${path}`,
-			err
+			err,
 		)
 	}
 }
@@ -107,7 +107,7 @@ export async function readFile(path: string): Promise<string> {
 export function write(
 	path: string,
 	contents: any,
-	mode?: number
+	mode?: number,
 ): Promise<void> {
 	return new Promise(function (resolve, reject) {
 		_writeFile(path, contents, { encoding: 'utf8', mode }, function (err) {
@@ -122,16 +122,16 @@ export function write(
 export async function writeFile(
 	path: string,
 	contents: any,
-	mode?: number
+	mode?: number,
 ): Promise<void> {
 	// check exists
 	try {
 		await exists(path)
-	} catch (err) {
+	} catch (err: any) {
 		// attempt write to non-existent file
 		try {
 			await write(path, contents, mode)
-		} catch (err) {
+		} catch (err: any) {
 			throw new Errlop(`failed to write the non-existent file: ${path}`, err)
 		}
 	}
@@ -139,17 +139,17 @@ export async function writeFile(
 	// check writable
 	try {
 		await writable(path)
-	} catch (err) {
+	} catch (err: any) {
 		throw new Errlop(`no write permission for the existing file: ${path}`, err)
 	}
 
 	// attempt write
 	try {
 		await write(path, contents, mode)
-	} catch (err) {
+	} catch (err: any) {
 		throw new Errlop(
 			`failed to write the existing and writable file: ${path}`,
-			err
+			err,
 		)
 	}
 }
@@ -170,7 +170,7 @@ export async function deleteFile(path: string): Promise<void> {
 	// check exists
 	try {
 		await exists(path)
-	} catch (err) {
+	} catch (err: any) {
 		// if it doesn't exist, then we don't care
 		return
 	}
@@ -178,20 +178,20 @@ export async function deleteFile(path: string): Promise<void> {
 	// check writable
 	try {
 		await writable(path)
-	} catch (err) {
+	} catch (err: any) {
 		throw new Errlop(
 			`no write permission to delete the existing file: ${path}`,
-			err
+			err,
 		)
 	}
 
 	// attempt delete
 	try {
 		await unlink(path)
-	} catch (err) {
+	} catch (err: any) {
 		throw new Errlop(
 			`failed to delete the existing and writable file: ${path}`,
-			err
+			err,
 		)
 	}
 }
@@ -211,24 +211,24 @@ export async function readDirectory(path: string): Promise<Array<string>> {
 	// check exists
 	try {
 		await exists(path)
-	} catch (err) {
+	} catch (err: any) {
 		throw new Errlop(`unable to read the non-existent directory: ${path}`, err)
 	}
 
 	// check readable
 	try {
 		await readable(path)
-	} catch (err) {
+	} catch (err: any) {
 		throw new Errlop(`no read permission for the directory: ${path}`, err)
 	}
 
 	// attempt read
 	try {
 		return await readdir(path)
-	} catch (err) {
+	} catch (err: any) {
 		throw new Errlop(
 			`failed to read the existing and readable directory: ${path}`,
-			err
+			err,
 		)
 	}
 }
