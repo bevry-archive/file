@@ -179,6 +179,12 @@ export async function deleteFile(path: string): Promise<void> {
 	try {
 		await writable(path)
 	} catch (err: any) {
+		if (err.code === 'ENOENT') {
+			// if it doesn't exist, then we don't care
+			// this may not seem necessary, however it is
+			// testen would fail on @bevry/json otherwise
+			return
+		}
 		throw new Errlop(
 			`no write permission to delete the existing file: ${path}`,
 			err,
@@ -189,6 +195,12 @@ export async function deleteFile(path: string): Promise<void> {
 	try {
 		await unlink(path)
 	} catch (err: any) {
+		if (err.code === 'ENOENT') {
+			// if it didn't exist, then we don't care
+			// this may not seem necessary, however it is
+			// testen would fail on @bevry/json otherwise
+			return
+		}
 		throw new Errlop(
 			`failed to delete the existing and writable file: ${path}`,
 			err,
