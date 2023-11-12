@@ -17,7 +17,7 @@ kava.suite('@bevry/file', function (suite, test) {
 	test('file works as expected', function (done) {
 		Promise.resolve()
 			.then(async function () {
-				const tmp = join(tmpdir(), 'bevry-file.txt')
+				const tmp = join(tmpdir(), `bevry-file-${Math.random()}.txt`)
 				await deleteFile(tmp) // ensure it does not exist, should not fail if it does not exist
 				const data = String(Math.random())
 				equal(
