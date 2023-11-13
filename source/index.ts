@@ -1,12 +1,65 @@
+// builtin
 import {
 	access as _access,
 	readFile as _readFile,
 	writeFile as _writeFile,
 	unlink as _unlink,
 	readdir as _readdir,
+	mkdir as _mkdir,
 	constants,
+	RmOptions,
+	MakeDirectoryOptions,
+	// dynamically imported as not present on all node versions
+	// rm as _rm,
+	// rmdir as _rmdir,
 } from 'fs'
+import { resolve as _resolve, dirname as _dirname } from 'path'
+import { exec } from 'child_process'
+import { versions } from 'process'
+const nodeVersion = String(versions.node || '0')
+
+// external
 import Errlop from 'errlop'
+import versionCompare from 'version-compare'
+
+/** Make the directory structure */
+export async function mkdirp(
+	path: string,
+	opts: MakeDirectoryOptions = {},
+): Promise<void> {
+	// if we already exist, nothing to do
+	if (await isPresent(path)) {
+		return
+	}
+
+	// create according to node.js version
+	if (versionCompare(nodeVersion, '14.14.0') >= 0) {
+		return new Promise(function (resolve, reject) {
+			_mkdir(
+				path,
+				Object.assign(
+					{
+						recursive: true,
+					},
+					opts,
+				),
+				function (err) {
+					if (err) return reject(err)
+					resolve()
+				},
+			)
+		})
+	} else {
+		const dir = _dirname(path)
+		await mkdirp(dir, opts)
+		return new Promise(function (resolve, reject) {
+			_mkdir(path, Object.assign({}, opts), function (err) {
+				if (err) return reject(err)
+				resolve()
+			})
+		})
+	}
+}
 
 /** Check access of a file */
 export function access(path: string, mode: number): Promise<void> {
@@ -20,7 +73,7 @@ export function access(path: string, mode: number): Promise<void> {
 
 /** Check the existence of a file */
 export function exists(path: string): Promise<void> {
-	return access(path, constants.F_OK)
+	return access(path, constants?.F_OK ?? 0) // node 4 compat
 }
 
 /** Check the existence status of a file */
@@ -32,7 +85,7 @@ export function isPresent(path: string): Promise<boolean> {
 
 /** Check the readable status of a file */
 export function readable(path: string): Promise<void> {
-	return access(path, constants.R_OK)
+	return access(path, constants?.R_OK ?? 4) // node 4 compat
 }
 
 /** Check the readable status of a file */
@@ -44,7 +97,7 @@ export function isReadable(path: string): Promise<boolean> {
 
 /** Check the writable status of a file */
 export function writable(path: string): Promise<void> {
-	return access(path, constants.W_OK)
+	return access(path, constants?.W_OK ?? 2) // node 4 compat
 }
 
 /** Check the writable status of a file */
@@ -56,7 +109,7 @@ export function isWritable(path: string): Promise<boolean> {
 
 /** Check the executable status of a file */
 export function executable(path: string): Promise<void> {
-	return access(path, constants.X_OK)
+	return access(path, constants?.X_OK ?? 1) // node 4 compat
 }
 
 /** Check the executable status of a file */
@@ -206,6 +259,130 @@ export async function deleteFile(path: string): Promise<void> {
 			err,
 		)
 	}
+}
+
+/** Remove an entire directory (including nested contents) safely. */
+export async function deleteEntireDirectory(
+	path: string,
+	opts: RmOptions = {},
+): Promise<void> {
+	// handle relative and absolute paths correctly
+	path = _resolve(path)
+
+	// check exists
+	try {
+		await exists(path)
+	} catch (err: any) {
+		// if it doesn't exist, then we don't care
+		return
+	}
+
+	// check writable
+	try {
+		await writable(path)
+	} catch (err: any) {
+		if (err.code === 'ENOENT') {
+			// if it doesn't exist, then we don't care
+			// this may not seem necessary, however it is
+			// testen would fail on @bevry/json otherwise
+			return
+		}
+		throw new Errlop(
+			`no write permission to delete the existing file: ${path}`,
+			err,
+		)
+	}
+
+	// attempt delete
+	return new Promise(function (resolve, reject) {
+		function next(err: any) {
+			if (err && err.code === 'ENOENT') return resolve()
+			if (err) return reject(err)
+			return resolve()
+		}
+		if (versionCompare(nodeVersion, '14.14.0') >= 0) {
+			import('fs').then(function ({ rm: _rm }) {
+				_rm(
+					path,
+					Object.assign({ recursive: true, force: true, maxRetries: 10 }, opts),
+					next,
+				)
+			})
+		} else if (
+			versionCompare(nodeVersion, '12.16.0') >= 0 &&
+			versionCompare(nodeVersion, '16') < 0
+		) {
+			import('fs').then(function ({ rmdir: _rmdir }) {
+				_rmdir(
+					path,
+					Object.assign({ recursive: true, maxRetries: 10 }, opts),
+					next,
+				)
+			})
+		} else if (
+			versionCompare(nodeVersion, '12.10.0') >= 0 &&
+			versionCompare(nodeVersion, '12.16.0') < 0
+		) {
+			import('fs').then(function ({ rmdir: _rmdir }) {
+				_rmdir(
+					path,
+					Object.assign({ recursive: true, maxBusyTries: 10 }, opts),
+					next,
+				)
+			})
+		} else {
+			if (path === '' || path === '/')
+				return next(new Error('will not delete root directory'))
+			exec(`rm -rf ${JSON.stringify(path)}`, next)
+		}
+	})
+}
+
+/** Read an entire directory (including nested contents) safely. */
+export async function readEntireDirectory(
+	path: string,
+): Promise<Array<string>> {
+	// handle relative and absolute paths correctly
+	path = _resolve(path)
+
+	// check exists
+	try {
+		await exists(path)
+	} catch (err: any) {
+		throw new Errlop(`unable to read the non-existent directory: ${path}`, err)
+	}
+
+	// check readable
+	try {
+		await readable(path)
+	} catch (err: any) {
+		throw new Errlop(`no read permission for the directory: ${path}`, err)
+	}
+
+	// attempt read
+	return new Promise(function (resolve, reject) {
+		if (versionCompare(nodeVersion, '18.17.0') >= 0) {
+			_readdir(
+				path,
+				{ encoding: null, recursive: true, withFileTypes: false },
+				function (err, files) {
+					if (err) return reject(err)
+					return resolve(files.sort())
+				},
+			)
+		} else {
+			exec(`find -f .`, { cwd: path }, function (err, stdout: string) {
+				if (err) return reject(err)
+				return resolve(
+					stdout
+						.split('\n')
+						.map((p) => p.replace(/^[./\\]+/, '')) // trim . and ./
+						.filter(Boolean)
+						.sort(),
+				)
+			})
+		}
+	})
 }
 
 /** Read a directory */

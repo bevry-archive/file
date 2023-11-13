@@ -203,5 +203,8 @@
   "prettier": {
     "semi": false,
     "singleQuote": true
+  },
+  "dependencies": {
+    "version-compare": "^3.0.0"
   }
 }
