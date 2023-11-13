@@ -25,7 +25,7 @@ import versionCompare from 'version-compare'
 /** Make the directory structure */
 export async function mkdirp(
 	path: string,
-	opts: MakeDirectoryOptions = {},
+	opts: MakeDirectoryOptions = {}
 ): Promise<void> {
 	// if we already exist, nothing to do
 	if (await isPresent(path)) {
@@ -41,12 +41,12 @@ export async function mkdirp(
 					{
 						recursive: true,
 					},
-					opts,
+					opts
 				),
 				function (err) {
 					if (err) return reject(err)
 					resolve()
-				},
+				}
 			)
 		})
 	} else {
@@ -151,7 +151,7 @@ export async function readFile(path: string): Promise<string> {
 	} catch (err: any) {
 		throw new Errlop(
 			`failed to read the existing and readable file: ${path}`,
-			err,
+			err
 		)
 	}
 }
@@ -160,7 +160,7 @@ export async function readFile(path: string): Promise<string> {
 export function write(
 	path: string,
 	contents: any,
-	mode?: number,
+	mode?: number
 ): Promise<void> {
 	return new Promise(function (resolve, reject) {
 		_writeFile(path, contents, { encoding: 'utf8', mode }, function (err) {
@@ -175,7 +175,7 @@ export function write(
 export async function writeFile(
 	path: string,
 	contents: any,
-	mode?: number,
+	mode?: number
 ): Promise<void> {
 	// check exists
 	try {
@@ -202,7 +202,7 @@ export async function writeFile(
 	} catch (err: any) {
 		throw new Errlop(
 			`failed to write the existing and writable file: ${path}`,
-			err,
+			err
 		)
 	}
 }
@@ -240,7 +240,7 @@ export async function deleteFile(path: string): Promise<void> {
 		}
 		throw new Errlop(
 			`no write permission to delete the existing file: ${path}`,
-			err,
+			err
 		)
 	}
 
@@ -256,7 +256,7 @@ export async function deleteFile(path: string): Promise<void> {
 		}
 		throw new Errlop(
 			`failed to delete the existing and writable file: ${path}`,
-			err,
+			err
 		)
 	}
 }
@@ -264,7 +264,7 @@ export async function deleteFile(path: string): Promise<void> {
 /** Remove an entire directory (including nested contents) safely. */
 export async function deleteEntireDirectory(
 	path: string,
-	opts: RmOptions = {},
+	opts: RmOptions = {}
 ): Promise<void> {
 	// handle relative and absolute paths correctly
 	path = _resolve(path)
@@ -289,7 +289,7 @@ export async function deleteEntireDirectory(
 		}
 		throw new Errlop(
 			`no write permission to delete the existing file: ${path}`,
-			err,
+			err
 		)
 	}
 
@@ -305,7 +305,7 @@ export async function deleteEntireDirectory(
 				_rm(
 					path,
 					Object.assign({ recursive: true, force: true, maxRetries: 10 }, opts),
-					next,
+					next
 				)
 			})
 		} else if (
@@ -316,7 +316,7 @@ export async function deleteEntireDirectory(
 				_rmdir(
 					path,
 					Object.assign({ recursive: true, maxRetries: 10 }, opts),
-					next,
+					next
 				)
 			})
 		} else if (
@@ -327,7 +327,7 @@ export async function deleteEntireDirectory(
 				_rmdir(
 					path,
 					Object.assign({ recursive: true, maxBusyTries: 10 }, opts),
-					next,
+					next
 				)
 			})
 		} else {
@@ -340,7 +340,7 @@ export async function deleteEntireDirectory(
 
 /** Read an entire directory (including nested contents) safely. */
 export async function readEntireDirectory(
-	path: string,
+	path: string
 ): Promise<Array<string>> {
 	// handle relative and absolute paths correctly
 	path = _resolve(path)
@@ -368,17 +368,18 @@ export async function readEntireDirectory(
 				function (err, files) {
 					if (err) return reject(err)
 					return resolve(files.sort())
-				},
+				}
 			)
 		} else {
-			exec(`find -f .`, { cwd: path }, function (err, stdout: string) {
+			// find files and dirs, -f doesn't work on ubuntu
+			exec('find .', { cwd: path }, function (err, stdout: string) {
 				if (err) return reject(err)
 				return resolve(
 					stdout
 						.split('\n')
 						.map((p) => p.replace(/^[./\\]+/, '')) // trim . and ./
 						.filter(Boolean)
-						.sort(),
+						.sort()
 				)
 			})
 		}
@@ -417,7 +418,7 @@ export async function readDirectory(path: string): Promise<Array<string>> {
 	} catch (err: any) {
 		throw new Errlop(
 			`failed to read the existing and readable directory: ${path}`,
-			err,
+			err
 		)
 	}
 }

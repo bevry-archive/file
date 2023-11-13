@@ -29,17 +29,17 @@ kava.suite('@bevry/file', function (suite, test) {
 				equal(
 					await isPresent(file),
 					false,
-					'is not present when it is not present',
+					'is not present when it is not present'
 				)
 				equal(
 					await isReadable(file),
 					false,
-					'is not readable when it is not present',
+					'is not readable when it is not present'
 				)
 				equal(
 					await isWritable(file),
 					false,
-					'is not writable when it is not present',
+					'is not writable when it is not present'
 				)
 				await writeFile(file, data)
 				equal(await isPresent(file), true, 'is present when it is present')
@@ -49,7 +49,7 @@ kava.suite('@bevry/file', function (suite, test) {
 				deepEqual(
 					await readdir(dir),
 					['file.txt'],
-					'directory with file was read',
+					'directory with file was read'
 				)
 				deepEqual(
 					await readEntireDirectory(root),
@@ -58,7 +58,7 @@ kava.suite('@bevry/file', function (suite, test) {
 						join('nested', 'directory'),
 						join('nested', 'directory', 'file.txt'),
 					],
-					'entire directory with file was read',
+					'entire directory with file was read'
 				)
 				await deleteFile(file)
 				equal(await isPresent(file), false, 'is not present when deleted')
@@ -67,23 +67,23 @@ kava.suite('@bevry/file', function (suite, test) {
 				deepEqual(
 					await readDirectory(dir),
 					[],
-					'directory with missing file was read',
+					'directory with missing file was read'
 				)
 				deepEqual(
 					await readEntireDirectory(root),
 					['nested', join('nested', 'directory')],
-					'entire directory was read',
+					'entire directory was read'
 				)
 				await deleteEntireDirectory(root)
 				equal(
 					await isPresent(dir),
 					false,
-					'is not present when it is not present',
+					'is not present when it is not present'
 				)
 				equal(
 					await isPresent(root),
 					false,
-					'is not present when it is not present',
+					'is not present when it is not present'
 				)
 			})
 			.then(() => done())
