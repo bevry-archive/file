@@ -36,6 +36,22 @@ Helpers for reading, writing, deleting, and accessing a file.
 
 [Complete API Documentation.](http://main.file.bevry.surge.sh/docs/)
 
+## Alternatives
+
+You should use these instead, which use and provide modern APIs while providing brilliant ecosystem support:
+
+- [@bevry/fs-accessible](https://github.com/bevry/fs-accessible)
+- [@bevry/fs-executable](https://github.com/bevry/fs-executable)
+- [@bevry/fs-list](https://github.com/bevry/fs-list)
+- [@bevry/fs-mkdirp](https://github.com/bevry/fs-mkdirp)
+- [@bevry/fs-read](https://github.com/bevry/fs-read)
+- [@bevry/fs-readable](https://github.com/bevry/fs-readable)
+- [@bevry/fs-remove](https://github.com/bevry/fs-remove)
+- [@bevry/fs-rmdir](https://github.com/bevry/fs-rmdir)
+- [@bevry/fs-unlink](https://github.com/bevry/fs-unlink)
+- [@bevry/fs-write](https://github.com/bevry/fs-write)
+- [@bevry/fs-writable](https://github.com/bevry/fs-writable)
+
 <!-- INSTALL/ -->
 
 <h2>Install</h2>
